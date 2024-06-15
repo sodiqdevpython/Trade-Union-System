@@ -5,3 +5,4 @@ Pipfile
 Pipfile.lock
 migrations
 media
+db.sqlite3
