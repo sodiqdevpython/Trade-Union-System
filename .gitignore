@@ -4,3 +4,4 @@ venv
 Pipfile
 Pipfile.lock
 migrations
+media
