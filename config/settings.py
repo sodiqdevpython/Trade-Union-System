@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
 
     # local
-    # 'organization',
+    'organization',
     # 'employee',
     "users",
 

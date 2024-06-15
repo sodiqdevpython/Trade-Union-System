@@ -16,7 +16,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("full_name", "id_card", "phone_number",
+        fields = ("full_name", "id_card", "phone_number", "organization",
                   "password1", "password2")
 
     def validate(self, attrs):
@@ -33,6 +33,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             full_name=validated_data.get("full_name"),
             id_card=validated_data.get("id_card"),
             phone_number=validated_data.get("phone_number"),
+            organization=validated_data.get("organization"),
             password=validated_data.get("password1")
         )
         return user

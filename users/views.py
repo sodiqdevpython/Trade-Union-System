@@ -36,6 +36,7 @@ class UserLoginAPIView(generics.GenericAPIView):
 
 
 class UserLogoutAPIView(generics.GenericAPIView):
+    serializer_class = None
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -48,9 +49,7 @@ class UserLogoutAPIView(generics.GenericAPIView):
 
 
 class UserProfileAPIView(generics.RetrieveAPIView):
-    # queryset = models.User.objects.all()
     serializer_class = serializers.UserSerializer
-    # permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user

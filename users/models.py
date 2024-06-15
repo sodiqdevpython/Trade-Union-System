@@ -8,6 +8,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=256)
     id_card = models.CharField(max_length=9, unique=True)
     phone_number = PhoneNumberField(region="UZ", unique=True)
+    organization = models.ForeignKey("organization.Organization", on_delete=models.CASCADE, null=True, related_name="organization")
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
