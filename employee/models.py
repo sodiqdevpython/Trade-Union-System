@@ -68,7 +68,9 @@ class Job(BaseModel):
 
 class Employee(BaseModel):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
-    oranization = models.CharField(max_length=256)
+
+    oranization = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
+
     gender = models.CharField(
         max_length=1, 
         choices=choices.GenderChoices.choices, 
@@ -107,10 +109,11 @@ class Employee(BaseModel):
         on_delete=models.CASCADE,
         related_name='role_note',
     )
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
     salary = models.PositiveIntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
     allocated_funds = models.PositiveBigIntegerField(default=0) # qancha pul ajratildi ushbu user uchun organization dan
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+
 
     def __str__(self) -> str:
         return f"{self.user.first_name} / {self.user.last_name}"

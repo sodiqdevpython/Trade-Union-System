@@ -65,16 +65,9 @@ class Organization(BaseModel):
     description = models.TextField(
         validators=[
             MinLengthValidator(150, "Ilitmos tashkilot haqida ko'proq ma'lumot bering!")
-        ]
+        ],
     )
-    staffs = models.ManyToManyField(
-        User,
-        related_name='staffs_list'
-    )
-    id_cards = models.ManyToManyField(
-        IdCards,
-        related_name='employee_id_card'
-    )
+
 
     def __str__(self):
         return self.name
