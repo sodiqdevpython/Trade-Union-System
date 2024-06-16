@@ -17,30 +17,6 @@ class IdCards(models.Model):
         verbose_name_plural = "ID kartalar"
 
 
-class ApplicationStatusModel(models.Model):
-    status = models.CharField(
-        max_length=2,
-        choices=choices.ApplicationStatusChoice.choices,
-        default=choices.ApplicationStatusChoice.send
-    )
-    who_rejected = models.ForeignKey(
-        Employee,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    who_are_viewed = models.ManyToManyField(
-        Employee,
-        related_name='application_viwed_staffs'
-    )
-
-    def __str__(self):
-        return self.get_status_display()
-
-    class Meta:
-        verbose_name = "Ariza holati"
-        verbose_name_plural = "Ariza holatlari"
-
-
 class Organization(BaseModel):
     name = models.CharField(
         max_length=256,
@@ -91,8 +67,7 @@ class Event(BaseModel):
         null=True
     )
     name = models.CharField(
-        max_length=100,
-        unique=True
+        max_length=100
     )
     spend_money = models.PositiveSmallIntegerField(
         default=0
@@ -127,10 +102,10 @@ class Application(BaseModel):
         on_delete=models.SET_NULL,
         null=True
     )
-    status_application = models.ForeignKey(
-        ApplicationStatusModel,
-        on_delete=models.SET_NULL,
-        null=True
+    status_application = models.CharField(
+        max_length=2,
+        choices=choices.ApplicationStatusChoice.choices,
+        default=choices.ApplicationStatusChoice.send
     )
 
     def __str__(self):
@@ -141,7 +116,15 @@ class Application(BaseModel):
         verbose_name_plural = "Arizalar"
 
 
-class SpiritualRest(BaseModel):
+class SpiritualRest(BaseModel):  #? Ma'naviy hordiq
+    author = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    spend_money = models.PositiveIntegerField(default=0)
+
     name = models.CharField(max_length=512)
     who_are_invited = models.ManyToManyField(
         Employee,

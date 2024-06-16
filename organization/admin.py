@@ -1,18 +1,11 @@
 from django.contrib import admin
-from .models import IdCards, ApplicationStatusModel, Organization, Event, Application, SpiritualRest, Accidents
+from .models import IdCards, Organization, Event, Application, SpiritualRest, Accidents
 
 @admin.register(IdCards)
 class IdCardsAdmin(admin.ModelAdmin):
     list_display = ('card_id', 'is_active')
     search_fields = ('card_id',)
     list_filter = ('is_active',)
-
-@admin.register(ApplicationStatusModel)
-class ApplicationStatusModelAdmin(admin.ModelAdmin):
-    list_display = ('status', 'who_rejected')
-    search_fields = ('status', 'who_rejected__first_name', 'who_rejected__last_name')
-    list_filter = ('status',)
-    filter_horizontal = ('who_are_viewed',)
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
@@ -30,7 +23,7 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author_application', 'status_application', 'created_at', 'updated_at')
+    list_display = ('title', 'author_application', 'status_application', 'created_at', 'updated_at', )
     search_fields = ('title', 'author_application__first_name', 'author_application__last_name')
     list_filter = ('status_application', 'created_at', 'updated_at')
     date_hierarchy = 'created_at'
