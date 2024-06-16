@@ -5,7 +5,8 @@ from .views import (
     IDCardViewSet,
     EventView,
     ApplicationView,
-    SpiritualRestView
+    SpiritualRestView,
+    AccidentsView
 )
 
 
@@ -13,6 +14,7 @@ router = DefaultRouter()
 router.register(r'organizations', OrganizationViewSet)
 router.register(r'id-cards', IDCardViewSet)
 router.register(r'spirtual-rest', SpiritualRestView)
+router.register(r'accident', AccidentsView)
 
 urlpatterns = [
     path('', include(router.urls)),

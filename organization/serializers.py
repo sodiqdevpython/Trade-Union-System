@@ -4,7 +4,8 @@ from .models import (
     IdCards, 
     Event,
     Application,
-    SpiritualRest
+    SpiritualRest,
+    Accidents
     )
 from .validators import validate_card_id
 
@@ -50,3 +51,13 @@ class SpiritualRestSerializer(serializers.ModelSerializer):
         model = SpiritualRest
         fields = '__all__'
         read_only_fields = ['author']
+
+class AccidentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Accidents
+        fields = (
+            'who', 
+            'spend_money', 
+            'more_info', 
+            'prove', 
+        )

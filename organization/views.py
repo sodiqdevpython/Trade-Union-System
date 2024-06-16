@@ -7,14 +7,16 @@ from .models import (
     IdCards,
     Event,
     Application,
-    SpiritualRest
+    SpiritualRest,
+    Accidents
     )
 from .serializers import (
     OrganizationSerializer,
     IDCardsSerializer,
     EventSerializer,
     ApplicationSerializer,
-    SpiritualRestSerializer
+    SpiritualRestSerializer,
+    AccidentsSerializer
     )
 
 
@@ -119,3 +121,7 @@ class SpiritualRestView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.employee_user)
+
+class AccidentsView(viewsets.ModelViewSet):
+    queryset = Accidents.objects.all()
+    serializer_class = AccidentsSerializer

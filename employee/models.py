@@ -68,7 +68,7 @@ class Job(BaseModel):
 
 class Employee(BaseModel):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='employee_user')
-    oranization = models.CharField(max_length=256)
+    # oranization = models.CharField(max_length=256)
     gender = models.CharField(
         max_length=1, 
         choices=choices.GenderChoices.choices, 

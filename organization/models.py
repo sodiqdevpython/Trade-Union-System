@@ -179,7 +179,7 @@ class Accidents(BaseModel):
         upload_to='prove/',
         validators=[
             FileExtensionValidator(
-                allowed_extensions=['pdf', 'docx', 'txt', 'xls'],
+                allowed_extensions=['pdf', 'docx', 'txt', 'xls', 'png', 'jpg', 'jpeg'],
                 message="Fayl formati to'g'riga o'xshamaydi"
             )
         ]

@@ -33,8 +33,8 @@ class JobAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'oranization', 'gender', 'tel_number', 'id_card', 'born_in', 'employment_at', 'job', 'salary', 'score', 'allocated_funds', 'created_at', 'updated_at')
-    search_fields = ('user__first_name', 'user__last_name', 'oranization', 'tel_number', 'id_card')
+    list_display = ('user', 'gender', 'tel_number', 'id_card', 'born_in', 'employment_at', 'job', 'salary', 'score', 'allocated_funds', 'created_at', 'updated_at')
+    search_fields = ('user__first_name', 'user__last_name', 'tel_number', 'id_card')
     list_filter = ('gender', 'job', 'born_in', 'employment_at', 'created_at', 'updated_at')
     date_hierarchy = 'employment_at'
     list_per_page = 20
