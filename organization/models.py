@@ -8,15 +8,15 @@ from organization import choices
 
 
 class Organization(BaseModel):
-    name = models.CharField(
+    title = models.CharField(
         max_length=256,
         unique=True,
         validators=[
             MinLengthValidator(5, message="Tashkilot nomini to'liqroq yozing")
         ]
     )
-    tel_number = PhoneNumberField(region="Uz", unique=True)
-    main_image = models.ImageField(
+    phone_number = PhoneNumberField(region="UZ", unique=True)
+    image = models.ImageField(
         upload_to='organization/images/',
         validators=[
             FileExtensionValidator(
@@ -25,6 +25,7 @@ class Organization(BaseModel):
             )
         ]
     )
+
     description = models.TextField(
         validators=[
             MinLengthValidator(
@@ -33,7 +34,7 @@ class Organization(BaseModel):
     )
 
     def __str__(self):
-        return self.name
+        return self.title
 
     class Meta:
         verbose_name = "Tashkilot"
@@ -62,6 +63,8 @@ class Event(BaseModel):
             )
         ]
     )
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="organizations")
 
     def __str__(self):
         return self.name
@@ -77,10 +80,10 @@ class Application(BaseModel):
     author_application = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
-        null=True
+        null=True, related_name="application"
     )
     status_application = models.CharField(
-        max_length=128, choices=choices.ApplicationStatusModel.choices, default=choices.ApplicationStatusChoice.send)
+        max_length=128, choices=choices.ApplicationStatusChoice.choices, default=choices.ApplicationStatusChoice.send)
 
     def __str__(self):
         return self.title
@@ -91,12 +94,8 @@ class Application(BaseModel):
 
 
 class SpiritualRest(BaseModel):
-    name = models.CharField(max_length=512)
-    who_are_invited = models.ManyToManyField(
-        Employee,
-        related_name='spirtual_rest_person'
-    )
-    more_info = models.TextField(
+    title = models.CharField(max_length=512)
+    description = models.TextField(
         validators=[
             MinLengthValidator(
                 100,
@@ -108,21 +107,14 @@ class SpiritualRest(BaseModel):
         upload_to='spirtual_rest/',
         validators=[
             FileExtensionValidator(
-                allowed_extensions=['png', 'jpg', 'jpeg', 'webp'],
-                message="Iltimos faqat rasm yuklang"
+                  allowed_extensions=['png', 'jpg', 'jpeg', 'webp'],
+                  message="Iltimos faqat rasm yuklang"
             )
         ]
     )
-    additional_doc = models.FileField(
-        upload_to='additional_docs/',
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['pdf', 'dosx', 'txt', 'xls'],
-                message="Fayl formati to'g'riga o'xshamaydi"
-            )
-        ],
-        null=True,
-        blank=True
+    user = models.ManyToManyField(
+        User,
+        related_name='users'
     )
 
     def __str__(self):
@@ -134,15 +126,15 @@ class SpiritualRest(BaseModel):
 
 
 class Accidents(BaseModel):
-    who = models.ForeignKey(
-        Employee,
+    user = models.ForeignKey(
+        User,
         on_delete=models.SET_NULL,
-        null=True
+        null=True, related_name="accidents"
     )
-    spend_money = models.PositiveBigIntegerField(default=0)
+    spend_money = models.DecimalField(max_digits=6, decimal_places=2)
     more_info = models.TextField()
     prove = models.FileField(
-        upload_to='prove/',
+        upload_to='accidents/',
         validators=[
             FileExtensionValidator(
                 allowed_extensions=['pdf', 'docx', 'txt', 'xls'],
@@ -152,7 +144,7 @@ class Accidents(BaseModel):
     )
 
     def __str__(self):
-        return f"{self.who} - {self.spend_money}"
+        return f"{self.user.full_name} - {self.spend_money}"
 
     class Meta:
         verbose_name = "Baxtsiz hodisa"

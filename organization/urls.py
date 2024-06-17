@@ -2,7 +2,6 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     OrganizationViewSet,
-    IDCardViewSet,
     EventView,
     ApplicationView,
     SpiritualRestView,
@@ -12,7 +11,6 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'organizations', OrganizationViewSet)
-router.register(r'id-cards', IDCardViewSet)
 router.register(r'spirtual-rest', SpiritualRestView)
 router.register(r'accident', AccidentsView)
 

@@ -1,13 +1,11 @@
 from rest_framework import serializers
 from .models import (
     Organization,
-    IdCards,
     Event,
     Application,
     SpiritualRest,
     Accidents
 )
-from .validators import validate_card_id
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -18,18 +16,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'tel_number',
             'main_image',
             'description',
-        )
-
-
-class IDCardsSerializer(serializers.ModelSerializer):
-
-    card_id = serializers.CharField(validators=[validate_card_id])
-
-    class Meta:
-        model = IdCards
-        fields = (
-            'card_id',
-            'is_active'
         )
 
 

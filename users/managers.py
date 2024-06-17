@@ -23,6 +23,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
 
         user = self.create_user(full_name=full_name,
-                                id_card=id_card, phone_number=phone_number, password=password, organiation=organiation, **extra_fields)
+                                id_card=id_card, phone_number=phone_number, password=password, organization=organization, **extra_fields)
         user.save(using=self.db)
         return user

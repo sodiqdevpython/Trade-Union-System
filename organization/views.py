@@ -4,29 +4,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import (
     Organization,
-    IdCards,
     Event,
     Application,
     SpiritualRest,
     Accidents
-    )
+)
 from .serializers import (
     OrganizationSerializer,
-    IDCardsSerializer,
     EventSerializer,
     ApplicationSerializer,
     SpiritualRestSerializer,
     AccidentsSerializer
-    )
+)
 
 
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
-class IDCardViewSet(viewsets.ModelViewSet):
-    queryset = IdCards.objects.all()
-    serializer_class = IDCardsSerializer
 
 class EventView(APIView):
 
@@ -55,10 +50,11 @@ class EventView(APIView):
                 'status': 'error',
                 'error details': serializered.errors
             })
-    
+
     def patch(self, request, id):
         get_event = get_object_or_404(Event, id=id)
-        serializered = EventSerializer(instance=get_event, data=request.data, partial=True)
+        serializered = EventSerializer(
+            instance=get_event, data=request.data, partial=True)
         if serializered.is_valid():
             serializered.save()
             return Response({
@@ -70,6 +66,7 @@ class EventView(APIView):
                 'status': 'error',
                 'error details': serializered.errors
             })
+
 
 class ApplicationView(APIView):
 
@@ -83,7 +80,8 @@ class ApplicationView(APIView):
             )
         else:
             get_applications = Application.objects.all()
-            serializered = ApplicationSerializer(get_applications, many=True).data
+            serializered = ApplicationSerializer(
+                get_applications, many=True).data
             return Response(serializered)
 
     def post(self, request):
@@ -93,7 +91,7 @@ class ApplicationView(APIView):
             serializered.save(author_application=request.user.employee_user)
             return Response({
                 'status': 'ok',
-                'result': serializered.data 
+                'result': serializered.data
             })
         else:
             return Response({
@@ -103,7 +101,8 @@ class ApplicationView(APIView):
 
     def patch(self, request, id):
         get_application = get_object_or_404(Application, id=id)
-        serializered = ApplicationSerializer(instance=get_application, data=request.data, partial=True)
+        serializered = ApplicationSerializer(
+            instance=get_application, data=request.data, partial=True)
         if serializered.is_valid():
             serializered.save()
             return Response({
@@ -114,13 +113,15 @@ class ApplicationView(APIView):
             return Response({
                 'error message': serializered.errors
             })
-        
+
+
 class SpiritualRestView(viewsets.ModelViewSet):
     queryset = SpiritualRest.objects.all()
     serializer_class = SpiritualRestSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user.employee_user)
+
 
 class AccidentsView(viewsets.ModelViewSet):
     queryset = Accidents.objects.all()
