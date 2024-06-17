@@ -4,19 +4,21 @@ from utils.models import BaseModel
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 
+
 class UnderAgeChildren(BaseModel):
     file = models.FileField(
-        upload_to='docs/under_age_children/', 
+        upload_to='docs/under_age_children/',
         null=True,
         blank=True
     )
-    
+
     def __str__(self):
         return f"Voyaga yetmagan farzand hujjati - {self.id}"
 
     class Meta:
         verbose_name = "Voyaga yetmagan farzand hujjati"
         verbose_name_plural = "Voyaga yetmagan farzandlar hujjatlari"
+
 
 class HandicappedDocsModel(BaseModel):
     file = models.FileField(
@@ -29,13 +31,14 @@ class HandicappedDocsModel(BaseModel):
         choices=choices.HandicappedType.choices,
         default=choices.HandicappedType.is_valid
     )
-    
+
     def __str__(self):
         return f"Nogironlik hujjati - {self.id}"
 
     class Meta:
         verbose_name = "Nogironlik haqidagi hujjat"
         verbose_name_plural = "Nogironlik haqidagi hujjatlar"
+
 
 class RoleNoteModel(BaseModel):
     file = models.FileField(
@@ -55,25 +58,23 @@ class RoleNoteModel(BaseModel):
     class Meta:
         verbose_name = "Daftar"
         verbose_name_plural = "Daftarlar"
-    
+
+
 class Job(BaseModel):
     name = models.CharField(max_length=128, unique=True)
 
     def __str__(self) -> str:
         return self.name
-    
+
     class Meta:
         verbose_name = "Ish turi"
         verbose_name_plural = "Ish turlari"
 
+
 class Employee(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
-
-    oranization = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
-
     gender = models.CharField(
-        max_length=1, 
-        choices=choices.GenderChoices.choices, 
+        max_length=1,
+        choices=choices.GenderChoices.choices,
         default=choices.GenderChoices.Male
     )
     tel_number = models.CharField(
@@ -111,9 +112,9 @@ class Employee(BaseModel):
     )
     salary = models.PositiveIntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
-    allocated_funds = models.PositiveBigIntegerField(default=0) # qancha pul ajratildi ushbu user uchun organization dan
+    # qancha pul ajratildi ushbu user uchun organization dan
+    allocated_funds = models.PositiveBigIntegerField(default=0)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
-
 
     def __str__(self) -> str:
         return f"{self.user.first_name} / {self.user.last_name}"
