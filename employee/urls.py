@@ -1,14 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import UnderAgeChildrenViewSet, HandicappedDocsModelViewSet, RoleNoteModelViewSet, JobViewSet, EmployeeViewSet
-
-router = DefaultRouter()
-router.register(r'under_age_children', UnderAgeChildrenViewSet)
-router.register(r'handicapped_docs', HandicappedDocsModelViewSet)
-router.register(r'role_notes', RoleNoteModelViewSet)
-router.register(r'jobs', JobViewSet)
-router.register(r'employees', EmployeeViewSet)
+from django.urls import path
+from django.contrib.auth.views import (
+    LogoutView, LoginView
+)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout')
 ]

@@ -68,7 +68,8 @@ class Job(BaseModel):
 
 class Employee(BaseModel):
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='employee_user')
-    # oranization = models.CharField(max_length=256)
+    oranization = models.ForeignKey("organization.Organization", on_delete=models.CASCADE)
+    profile_image = models.ImageField(upload_to='profile_images/', default='default.png')
     gender = models.CharField(
         max_length=1, 
         choices=choices.GenderChoices.choices, 
@@ -111,7 +112,7 @@ class Employee(BaseModel):
     salary = models.PositiveIntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
     allocated_funds = models.PositiveBigIntegerField(default=0) # qancha pul ajratildi ushbu user uchun organization dan
-
+    is_verified = models.BooleanField(default=False)
     def __str__(self) -> str:
         return f"{self.user.first_name} / {self.user.last_name}"
 
