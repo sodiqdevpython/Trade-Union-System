@@ -1,128 +1,107 @@
-from rest_framework import viewsets
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import (
-    Organization,
-    Event,
-    Application,
-    SpiritualRest,
-    Accidents
-)
-from .serializers import (
-    OrganizationSerializer,
-    EventSerializer,
-    ApplicationSerializer,
-    SpiritualRestSerializer,
-    AccidentsSerializer
-)
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required, user_passes_test
+from users.models import User, UserExtraData
+from organization.models import Money, Application, Organization, Event
+from .permissions import superuser_required
+from .forms import EventForm
+
+@login_required
+def dashboard(request):
+    if request.user.is_staff:
+        verify_user = User.objects.filter(is_verified=False)
+        current_money = Money.objects.get(id=1)
+        users_salaries = sum(UserExtraData.objects.values_list('salary', flat=True))
+        employee_count = User.objects.filter(is_verified=True).count()
+        application_count = Application.objects.all().count()
+        organization = Organization.objects.get(id=1)
+        the_latest_news = Event.objects.get(id=1)
+        context = {
+            'current_money': current_money,
+            'users_salary': float(users_salaries) / 100,
+            'employee_count': employee_count,
+            'application_count': application_count,
+            'organization': organization,
+            'should_verify': verify_user.count(),
+            'verify_user': verify_user,
+            'the_latest_news': the_latest_news
+        }
+        return render(request, 'dashboard.html', context)
+    else:
+        return redirect('profile')
+
+@login_required
+def profile(request):
+    if not request.user.is_verified:
+        return redirect('filling_info')
+    else:
+        context = {
+            'data': get_object_or_404(User, id=request.user.id),
+            'events': Event.objects.all()[::4]
+        }
+        return render(request, 'profile.html', context)
+
+@login_required
+@user_passes_test(superuser_required)
+def tables(request):
+    users_data = User.objects.all().filter(is_verified=True)
+    context = {
+        'users_data': users_data
+    }
+    return render(request, 'tables.html', context)
+
+@login_required
+def billing(request):
+    money = Money.objects.get(id=1)
+    users_salaries = sum(UserExtraData.objects.values_list('salary', flat=True))
+    context = {
+        'money': money,
+        'users_salaries': users_salaries
+    }
+    return render(request, 'billing.html', context)
 
 
-class OrganizationViewSet(viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+@login_required
+@user_passes_test(superuser_required)
+def user_profile(request, id_card):
+    user = get_object_or_404(User, id_card=id_card)
+    context = {
+        'data': user
+    }
 
+    return render(request, 'profile.html', context)
 
-class EventView(APIView):
+@login_required
+def verify_user(request, id):
+    user = get_object_or_404(User, id=id)
+    user.is_verified=True
+    user.save()
+    return redirect('dashboard')
 
-    def get(self, request, id=None):
-        if id:
-            event_data = get_object_or_404(Event, id=id)
-            serializered = EventSerializer(event_data)
+@login_required
+@user_passes_test(superuser_required)
+def create_event(request):
+    if request.method=='POST':
+        form = EventForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
         else:
-            event_data = Event.objects.all()
-            serializered = EventSerializer(event_data, many=True)
+            print(form.errors)
+    else:
+        form = EventForm()
+    
+    context = {
+        'form': form
+    }
 
-        return Response(serializered.data)
+    return render(request, 'add_event.html', context)
 
-    def post(self, request):
-        get_data = request.data
-        serializered = EventSerializer(data=get_data)
-        if serializered.is_valid():
-            serializered.save(author=request.user)
+@login_required
+def event_detail(request, id):
+    data = get_object_or_404(Event, id=id)
 
-            return Response({
-                'status': 'ok',
-                'result': serializered.data
-            })
-        else:
-            return Response({
-                'status': 'error',
-                'error details': serializered.errors
-            })
+    context = {
+        'data': data
+    }
 
-    def patch(self, request, id):
-        get_event = get_object_or_404(Event, id=id)
-        serializered = EventSerializer(
-            instance=get_event, data=request.data, partial=True)
-        if serializered.is_valid():
-            serializered.save()
-            return Response({
-                'status': 'ok',
-                'result': serializered.data
-            })
-        else:
-            return Response({
-                'status': 'error',
-                'error details': serializered.errors
-            })
-
-
-class ApplicationView(APIView):
-
-    def get(self, request, id=None):
-        if id:
-            get_application = get_object_or_404(Application, id=id)
-            return Response(
-                ApplicationSerializer(
-                    get_application
-                ).data
-            )
-        else:
-            get_applications = Application.objects.all()
-            serializered = ApplicationSerializer(
-                get_applications, many=True).data
-            return Response(serializered)
-
-    def post(self, request):
-        get_data = request.data
-        serializered = ApplicationSerializer(data=get_data)
-        if serializered.is_valid():
-            serializered.save(author_application=request.user.employee_user)
-            return Response({
-                'status': 'ok',
-                'result': serializered.data
-            })
-        else:
-            return Response({
-                'status': 'error',
-                'error message': serializered.errors
-            })
-
-    def patch(self, request, id):
-        get_application = get_object_or_404(Application, id=id)
-        serializered = ApplicationSerializer(
-            instance=get_application, data=request.data, partial=True)
-        if serializered.is_valid():
-            serializered.save()
-            return Response({
-                'status': 'ok',
-                'result': serializered.data
-            })
-        else:
-            return Response({
-                'error message': serializered.errors
-            })
-
-
-class SpiritualRestView(viewsets.ModelViewSet):
-    queryset = SpiritualRest.objects.all()
-    serializer_class = SpiritualRestSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user.employee_user)
-
-
-class AccidentsView(viewsets.ModelViewSet):
-    queryset = Accidents.objects.all()
-    serializer_class = AccidentsSerializer
+    return render(request, 'detail_event.html', context)

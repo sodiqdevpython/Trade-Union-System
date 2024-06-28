@@ -1,55 +1,76 @@
-from rest_framework import generics, status, permissions, views
-from rest_framework.response import Response
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-from django.shortcuts import get_object_or_404
-from users import models, serializers
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout, authenticate, login
+from .forms import UserSignUpForm, UpdateProfile
+from django.contrib.auth.decorators import login_required
+from .forms import UserExtraDataForm
+from .models import UserExtraData, Job, User
+
+def sign_out(request):
+    logout(request)
+    return redirect('login')
+
+def sign_up(request):
+    if request.method == 'POST':
+        form = UserSignUpForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            user = authenticate(id_card=form.cleaned_data.get('id_card'), password=form.cleaned_data.get('password1'))
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard') 
+        else:
+            print(form.errors)
+
+    else:
+        form = UserSignUpForm()
+
+    return render(request, 'registration/sign-up.html', {'form': form})
 
 
-class UserRegisterAPIView(generics.CreateAPIView):
-    serializer_class = serializers.UserRegisterSerializer
+@login_required
+def profile_update(request, id):
+    user_profile = get_object_or_404(User, id=id)
+    updating_profile = get_object_or_404(UserExtraData, user=user_profile)
+    if request.method=='POST' and user_profile.id==request.user.id:
+        form = UpdateProfile(request.POST or None, instance=updating_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+        else:
+            print(form.errors)
+    else:
+        form = UpdateProfile(instance=updating_profile)
+    
+    context = {
+            'form': form,
+            'data': updating_profile
+        }
+    
+    return render(request, 'profile_update.html', context)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-            "data": serializers.UserSerializer(user, context=self.get_serializer_context()).data,
-        })
+@login_required
+def filling_info(request):
+    if request.method=='POST':
+        form = UserExtraDataForm(request.POST or None)
+        if form.is_valid():
+            user_data = form.save(commit=False)
+            user_data.user = request.user
+            user_data.save()
+            return redirect('filling_info')
+        else:
+            print(form.errors)
+    else:
+        if UserExtraData.objects.filter(user=request.user).exists():
+            can_update = False
+        else:
+            can_update = True
+        form = UserExtraDataForm()
 
-
-class UserLoginAPIView(generics.GenericAPIView):
-    serializer_class = serializers.SinginSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = authenticate(
-            request, id_card=serializer.validated_data['id_card'], password=serializer.validated_data['password'])
-        if not user:
-            return Response({"message": "Bunday user yo'q"}, status=status.HTTP_401_UNAUTHORIZED)
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            "token": token.key,
-            "user": serializers.UserSerializer(user, context=self.get_serializer_context()).data,
-        })
-
-
-class UserLogoutAPIView(generics.GenericAPIView):
-    serializer_class = None
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        try:
-            token = Token.objects.filter(user=request.user).first()
-            token.delete()
-            return Response({"message": "Siz saytdan chiqib ketdingiz."}, status=status.HTTP_200_OK)
-        except Token.DoesNotExist:
-            return Response({"message": "Bunaqa token yo'q"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserProfileAPIView(generics.RetrieveAPIView):
-    serializer_class = serializers.UserSerializer
-
-    def get_object(self):
-        return self.request.user
+    if UserExtraData.objects.filter(user=request.user).exists():
+        can_update = False
+    else:
+        can_update = True
+    
+    return render(request, 'filling_info.html', context={'can_update': can_update, 'job_list': Job.objects.all()})

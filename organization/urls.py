@@ -1,23 +1,17 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from .views import (
-    OrganizationViewSet,
-    EventView,
-    ApplicationView,
-    SpiritualRestView,
-    AccidentsView
+    dashboard, profile, tables,
+    billing, user_profile, verify_user,
+    create_event, event_detail
 )
 
-
-router = DefaultRouter()
-router.register(r'organizations', OrganizationViewSet)
-router.register(r'spirtual-rest', SpiritualRestView)
-router.register(r'accident', AccidentsView)
-
 urlpatterns = [
-    path('', include(router.urls)),
-    path('event/', EventView.as_view()),
-    path('event/<int:id>/', EventView.as_view()),
-    path('application/', ApplicationView.as_view()),
-    path('application/<int:id>/', ApplicationView.as_view())
+    path('', dashboard, name='dashboard'),
+    path('profile/', profile, name='profile'),
+    path('tables/', tables, name='tables'),
+    path('billing/', billing, name='billing'),
+    path('user-profile/<str:id_card>/', user_profile, name='user_profile'),
+    path('verify/<int:id>/', verify_user, name='verify_user'),
+    path('createcreate_event/', create_event, name='create_event'),
+    path('event/<int:id>/', event_detail, name='event_detail')
 ]

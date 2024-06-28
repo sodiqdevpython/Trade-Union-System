@@ -6,6 +6,25 @@ from utils.models import BaseModel
 from users.models import User
 from organization import choices
 
+class IDCards(BaseModel):
+    id_card = models.CharField(max_length=9, unique=True)
+
+    def __str__(self):
+        return self.id_card
+    
+    class Meta:
+        verbose_name = "ID karta"
+        verbose_name_plural = "ID kartalar"
+
+class Money(BaseModel):
+    current_money = models.DecimalField(default=0, decimal_places=4, max_digits=10)
+    
+    def __str__(self):
+        return str(self.current_money)
+
+    class Meta:
+        verbose_name = "Pul"
+        verbose_name_plural = "Pul"
 
 class Organization(BaseModel):
     title = models.CharField(
@@ -63,11 +82,9 @@ class Event(BaseModel):
             )
         ]
     )
-    organization = models.ForeignKey(
-        Organization, on_delete=models.CASCADE, related_name="organizations")
 
     def __str__(self):
-        return self.name
+        return self.title
 
     class Meta:
         verbose_name = "Tadbir"
@@ -144,7 +161,7 @@ class Accidents(BaseModel):
     )
 
     def __str__(self):
-        return f"{self.user.full_name} - {self.spend_money}"
+        return f"{self.user} - {self.spend_money}"
 
     class Meta:
         verbose_name = "Baxtsiz hodisa"

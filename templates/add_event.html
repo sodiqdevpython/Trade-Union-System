@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <form action="{% url 'create_event' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Tadbir nomi</label>
+            <input name="title" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Tadbir nomi" required>
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Ajratilishi kerak bo'lgan mablag'</label>
+            <input name="spend_money" type="number" class="form-control" id="exampleFormControlInput1" placeholder="Mablag' sumda" required>
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Ko'proq ma'lumot</label>
+            <textarea name="description" class="form-control" id="exampleFormControlTextarea1" rows="12" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Rasm</label>
+            <input max="10" name="image" class="form-control" type="file" required>
+        </div>
+        <input type="submit" value="Yaratish" class="btn btn-success">
+    </form>
+</div>
+{% endblock content %}
